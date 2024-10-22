@@ -33,9 +33,9 @@ def log_stat():
         counted_methods = collection_db.count_documents({"method": method})
         print(f"\tmethod {method}: {counted_methods}")
 
-    status_check_counted = collection_db.count_documents({
-        "method": "GET", "path": "/status"
-    })
+    status_check_counted = collection_db.count_documents(
+        {"method": "GET", "path": "/status"}
+    )
     print(f"{status_check_counted} status check")
 
 
