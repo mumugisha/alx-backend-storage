@@ -1,3 +1,2 @@
-// Show all the databases
-
-SHOW DBS
+// A script that show all the databases
+show dbs
