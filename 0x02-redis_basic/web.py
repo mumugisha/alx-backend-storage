@@ -19,18 +19,16 @@ def count_url_access(method):
     @wraps(method)
     def wrapper(url):
         result_cache_key = "cached:" + url
-        count_cache_key = "count:" + url
-
         result_cache_data = store.get(result_cache_key)
         if result_cache_data:
             return result_cache_data.decode("utf-8")
 
+        count_cache_key = "count:" + url
         html = method(url)
 
         store.incr(count_cache_key)
-
-        store.setex(result_cache_key, 10, html)
-
+        store.set(count_cache_key, html)
+        store.expire(result_cache_key, 10)
         return html
     return wrapper
 
