@@ -45,8 +45,4 @@ def get_page(url: str) -> str:
 
 
 if __name__ == "__main__":
-    test_url = (
-        'http://slowwly.robertomurray.co.uk/delay/10000/'
-        'url/https://www.google.com'
-    )
     print(get_page(test_url))
