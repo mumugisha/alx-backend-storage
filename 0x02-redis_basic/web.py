@@ -1,43 +1,36 @@
 #!/usr/bin/env python3
 """
-Implementing an expiring web cache and tracker
+web cache and tracker
 """
-
-import redis
 import requests
+import redis
 from functools import wraps
 
-# Redis connection
 store = redis.Redis()
 
 
-def track_url_access(method):
-    """
-    Track how many times a particular URL was accessed
-    and cache the result for 10 seconds.
-    """
+def count_url_access(method):
+    """ Decorator counting how many times
+    a URL is accessed """
     @wraps(method)
     def wrapper(url):
-        result_cache_key = "cached:" + url
-        result_cache_data = store.get(result_cache_key)
+        cached_key = "cached:" + url
+        cached_data = store.get(cached_key)
+        if cached_data:
+            return cached_data.decode("utf-8")
 
-        if result_cache_data:
-            return result_cache_data.decode("utf-8")
-
-        count_cache_key = "count:" + url
+        count_key = "count:" + url
         html = method(url)
 
-        store.incr(count_cache_key)
-        store.set(result_cache_key, html)
-        store.expire(result_cache_key, 10)
+        store.incr(count_key)
+        store.set(cached_key, html)
+        store.expire(cached_key, 10)
         return html
     return wrapper
 
 
-@track_url_access
+@count_url_access
 def get_page(url: str) -> str:
-    """
-    Fetch the HTML content of a given URL.
-    """
-    resp = requests.get(url)
-    return resp.text
+    """ Returns HTML content of a url """
+    res = requests.get(url)
+    return res.text
