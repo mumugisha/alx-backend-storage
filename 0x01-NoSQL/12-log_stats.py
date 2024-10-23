@@ -7,7 +7,7 @@ about Nginx logs stored in MongoDB.
 from pymongo import MongoClient
 
 
-def log_stat():
+def log_stats():
     """
     Connect to MongoDB, retrieve and print the
     number of logs and methods statistics.
@@ -27,7 +27,7 @@ def log_stat():
     print(f"{log_count} logs")
 
     methods = ["GET", "POST", "PUT", "PATCH", "DELETE"]
-    print("Methods stats:")
+    print("Methods:")
 
     for method in methods:
         counted_methods = collection_db.count_documents({"method": method})
@@ -40,4 +40,4 @@ def log_stat():
 
 
 if __name__ == "__main__":
-    log_stat()
+    log_stats()
