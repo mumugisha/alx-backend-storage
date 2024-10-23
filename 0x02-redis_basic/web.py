@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 """
-Implementing an expiring web cache and tracker
+Implementing a web cache and tracker
 """
 
-import requests
 import redis
+import requests
 from functools import wraps
 
 store = redis.Redis()
@@ -12,24 +12,26 @@ store = redis.Redis()
 
 def count_url_access(method):
     """
-    Track how many times a particular URL was accessed
+    Decorator to track how many times a particular URL was accessed
     and cache the result for 10 seconds.
     """
     @wraps(method)
-    def wrapper(url):
-        result_cache_key = "cached:" + url
-        count_cache_key = "count:" + url
+    def wrapper(url: str) -> str:
+        result_cache_key = f"cached:{url}"
+        count_cache_key = f"count:{url}"
 
-        result_cache_data = store.get(result_cache_key)
-        if result_cache_data:
-            return result_cache_data.decode("utf-8")
+    result_cache_data = store.get(result_cache_key)
+    if result_cache_data:
+        return result_cache_data.decode("utf-8")
 
-        html = method(url)
+        html_content = method(url)
 
         store.incr(count_cache_key)
-        store.setex(result_cache_key, 10, html)
 
-        return html
+        store.setex(result_cache_key, 10, html_content)
+
+        return html_content
+
     return wrapper
 
 
@@ -38,5 +40,13 @@ def get_page(url: str) -> str:
     """
     Fetch the HTML content of a given URL.
     """
-    resp = requests.get(url)
-    return resp.text
+    response = requests.get(url)
+    return response.text
+
+
+if __name__ == "__main__":
+    test_url = (
+        'http://slowwly.robertomurray.co.uk/delay/10000/'
+        'url/https://www.google.com'
+    )
+    print(get_page(test_url))
