@@ -38,5 +38,6 @@ def get_page(url: str) -> str:
     """
     Fetch the HTML content of a given URL.
     """
-    resp = requests.get(url)
+    resp = requests.get('http://slowwly.robertomurray.co.uk/delay/10000/'
+        'url/https://www.example.com')
     return resp.text
