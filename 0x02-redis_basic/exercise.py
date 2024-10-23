@@ -84,7 +84,9 @@ class Cache:
         self._redis.set(self._key, data)
         return self._key
 
-    def get(self, key: str, fn: Optional[Callable] = None) -> Union[str, bytes, int, float]:
+    def get(
+        self, key: str, fn: Optional[Callable] = None
+    ) -> Union[str, bytes, int, float]:
         """
         Convert data to the right format
         """
