@@ -2,6 +2,7 @@
 """
 Implementing an expiring web cache and tracker
 """
+
 import redis
 import requests
 from functools import wraps
@@ -38,7 +39,5 @@ def get_page(url: str) -> str:
     """
     Fetch the HTML content of a given URL.
     """
-    resp = requests.get(
-        'http://slowwly.robertomurray.co.uk/delay/10000/url/https://www.example.com'
-    )
+    resp = requests.get(url)
     return resp.text
