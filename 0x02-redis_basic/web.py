@@ -17,20 +17,26 @@ def track_url_access(method):
     and cache the result for 10 seconds.
     """
     @wraps(method)
-    def wrapper(url):
+    def wrapper(url: str):
+        # Cache keys for storing the result and count
         result_cache_key = "cached:" + url
+        count_cache_key = "count:" + url
+
         result_cache_data = store.get(result_cache_key)
 
         if result_cache_data:
+            # Return cached data if found
             return result_cache_data.decode("utf-8")
 
-        count_cache_key = "count:" + url
+        store.incr(count_cache_key)
+
         html = method(url)
 
-        store.incr(count_cache_key)
         store.set(result_cache_key, html)
         store.expire(result_cache_key, 10)
+
         return html
+
     return wrapper
 
 
@@ -41,3 +47,8 @@ def get_page(url: str) -> str:
     """
     resp = requests.get(url)
     return resp.text
+
+
+if __name__ == "__main__":
+    url = "http://google.com"
+    print(get_page(url))
