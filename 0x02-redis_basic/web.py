@@ -7,11 +7,10 @@ import redis
 import requests
 from functools import wraps
 
-# Redis connection
 store = redis.Redis()
 
 
-def track_url_access(method):
+def count_url_access(method):
     """
     Track how many times a particular URL was accessed
     and cache the result for 10 seconds.
@@ -38,7 +37,7 @@ def track_url_access(method):
     return wrapper
 
 
-@track_url_access
+@count_url_access
 def get_page(url: str) -> str:
     """
     Fetch the HTML content of a given URL.
