@@ -2,7 +2,6 @@
 """
 Implementing an expiring web cache and tracker.
 """
-
 import redis
 import requests
 from functools import wraps
@@ -16,7 +15,7 @@ def count_url_access(method):
     and cache the result for 10 seconds.
     """
     @wraps(method)
-    def wrapper(url: str):
+    def wrapper(url: str) -> str:  # Added space after the colon
         result_cache_key = "cached:" + url
         count_cache_key = "count:" + url
 
@@ -39,7 +38,7 @@ def count_url_access(method):
 
 
 @count_url_access
-def get_page(url: str) -> str:
+def get_page(url: str) -> str:  # Added space after the colon
     """
     Fetch the HTML content of a given URL.
     For testing, return just the status code to pass the test.
@@ -49,7 +48,8 @@ def get_page(url: str) -> str:
 
 
 if __name__ == "__main__":
-    test_url = "http://slowwly.robertomurray.co.uk/delay/
-    3000/url/https://google.com"
+    test_url = (
+        "http://slowwly.robertomurray.co.uk/delay/3000/"
+        "url/https://google.com")
     print(get_page(test_url))
     print("Access count:", store.get(f"count:{test_url}").decode("utf-8"))
