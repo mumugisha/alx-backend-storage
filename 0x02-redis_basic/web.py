@@ -14,6 +14,8 @@ def count_url_access(method):
     Track how many times a particular URL was accessed
     and cache the result for 10 seconds.
     """
+
+
     @wraps(method)
     def wrapper(url: str) -> str:  # Added space after the colon
         result_cache_key = "cached:" + url
