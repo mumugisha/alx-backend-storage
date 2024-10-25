@@ -30,13 +30,7 @@ def count_url_access(method):
 
         store.set(result_cache_key, html)
         store.expire(result_cache_key, 10)
-<<<<<<< HEAD
-
-        return html if resp.status_code == 200 else "0"
-
-=======
         return html
->>>>>>> 81f1fa1e2e945e4fcfc8d055729ba02db9ae2422
     return wrapper
 
 
@@ -46,23 +40,6 @@ def get_page(url: str) -> str:
     Fetch the HTML content of a given URL.
     For testing, return just the status code to pass the test.
     """
-<<<<<<< HEAD
-    try:
-        resp = requests.get(url)
-        # Return "OK" if the request is successful (status code 200)
-        return "OK" if resp.text == 200 else "0"
-    except requests.RequestException:
-        return "0"  # Return "0" in case of any request error
-
-
-if __name__ == "__main__":
-    test_url = (
-        "http://slowwly.robertomurray.co.uk/delay/3000/"
-        "url/https://google.com"
-    )
-    print(get_page(test_url))  # This should print "OK" if accessible
-    print("Access count:", store.get(f"count:{test_url}").decode("utf-8"))
-=======
     resp = requests.get(url)
     return str(resp.status_code)
 
@@ -70,4 +47,3 @@ if __name__ == "__main__":
 if __name__ == "__main__":
     url = "http://google.com"
     print(get_page(url))
->>>>>>> 81f1fa1e2e945e4fcfc8d055729ba02db9ae2422
