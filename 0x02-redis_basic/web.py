@@ -20,15 +20,16 @@ def count_url_access(method):
         result_cache_key = "cached:" + url
         count_cache_key = "count:" + url
 
-        result_cache_data = store.get(result_cache_key)
+        # Increment the count every time get_page is called
+        store.incr(count_cache_key)
 
+        # Check if content is in the cache
+        result_cache_data = store.get(result_cache_key)
         if result_cache_data:
             return result_cache_data.decode("utf-8")
 
-        store.incr(count_cache_key)
-
+        # Fetch content if not cached, then cache it for 10 seconds
         html = method(url)
-
         store.set(result_cache_key, html)
         store.expire(result_cache_key, 10)
 
@@ -44,7 +45,6 @@ def get_page(url: str) -> str:
     For testing, return just the status code to pass the test.
     """
     resp = requests.get(url)
-
     return str(resp.status_code)
 
 
