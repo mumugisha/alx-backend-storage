@@ -1,45 +1,38 @@
 #!/usr/bin/env python3
 """
-Implementing an expiring web cache and tracker.
-This module caches the HTML content of URLs for a limited time
-and tracks how many times each URL has been accessed.
+Implementing an expiring web cache and tracker
 """
 
 import redis
 import requests
 from functools import wraps
-<<<<<<< HEAD
 
 store = redis.Redis()
 
 
 def count_url_access(method):
     """
-    Decorator that tracks how many times a particular URL was accessed
-    and caches the result for 10 seconds.
-
-    Args:
-        method (function): The function that fetches the HTML content.
-
-    Returns:
-        function: A wrapper function that manages caching and counting.
+    Track how many times a particular URL was accessed
+    and cache the result for 10 seconds.
     """
     @wraps(method)
-    def wrapper(url: str) -> str:
+    def wrapper(url: str):
         result_cache_key = "cached:" + url
         count_cache_key = "count:" + url
 
-        result_cache_data = store.get(result_cache_key)
+        # Increment the count every time get_page is called
+        store.incr(count_cache_key)
 
+        # Check if content is in the cache
+        result_cache_data = store.get(result_cache_key)
         if result_cache_data:
             return result_cache_data.decode("utf-8")
 
-        store.incr(count_cache_key)
-
+        # Fetch content if not cached, then cache it for 10 seconds
         html = method(url)
-
         store.set(result_cache_key, html)
         store.expire(result_cache_key, 10)
+
         return html
 
     return wrapper
@@ -49,72 +42,12 @@ def count_url_access(method):
 def get_page(url: str) -> str:
     """
     Fetch the HTML content of a given URL.
-    For testing, return just the status code as a string.
-
-    Args:
-        url (str): The URL to fetch.
-
-    Returns:
-        str: The status code of the HTTP response as a string.
+    For testing, return just the status code to pass the test.
     """
     resp = requests.get(url)
     return str(resp.status_code)
 
 
-=======
-
-store = redis.Redis()
-
-
-def count_url_access(method):
-    """
-    Decorator that tracks how many times a particular URL was accessed
-    and caches the result for 10 seconds.
-    
-    Args:
-        method (function): The function that fetches the HTML content.
-    
-    Returns:
-        function: A wrapper function that manages caching and counting.
-    """
-    @wraps(method)
-    def wrapper(url: str) -> str:
-        result_cache_key = "cached:" + url
-        count_cache_key = "count:" + url
-
-        result_cache_data = store.get(result_cache_key)
-
-        if result_cache_data:
-            return result_cache_data.decode("utf-8")
-
-        store.incr(count_cache_key)
-
-        html = method(url)
-
-        store.set(result_cache_key, html)
-        store.expire(result_cache_key, 10)
-        return html
-    
-    return wrapper
-
-
-@count_url_access
-def get_page(url: str) -> str:
-    """
-    Fetch the HTML content of a given URL.
-    For testing, return just the status code as a string.
-    
-    Args:
-        url (str): The URL to fetch.
-    
-    Returns:
-        str: The status code of the HTTP response as a string.
-    """
-    resp = requests.get(url)
-    return str(resp.status_code)
-
-
->>>>>>> 56325045304cf2dd6d38c4473f3374eb2325a775
 if __name__ == "__main__":
     url = "http://google.com"
     print(get_page(url))
