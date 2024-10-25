@@ -1,53 +1,38 @@
 #!/usr/bin/env python3
-"""
-Implementing an expiring web cache and tracker
-"""
-
+'''A module with tools for request caching and tracking.
+'''
 import redis
 import requests
 from functools import wraps
+from typing import Callable
 
-store = redis.Redis()
+
+redis_store = redis.Redis()
+'''The module-level Redis instance.
+'''
 
 
-def count_url_access(method):
-    """
-    Track how many times a particular URL was accessed
-    and cache the result for 10 seconds.
-    """
+def data_cacher(method: Callable) -> Callable:
+    '''Caches the output of fetched data.
+    '''
     @wraps(method)
-    def wrapper(url: str):
-        result_cache_key = "cached:" + url
-        count_cache_key = "count:" + url
-
-        # Increment the count every time get_page is called
-        store.incr(count_cache_key)
-
-        # Check if content is in the cache
-        result_cache_data = store.get(result_cache_key)
-        if result_cache_data:
-            return result_cache_data.decode("utf-8")
-
-        # Fetch content if not cached, then cache it for 10 seconds
-        html = method(url)
-        store.set(result_cache_key, html)
-        store.expire(result_cache_key, 10)
-
-        return html
-
-    return wrapper
+    def invoker(url) -> str:
+        '''The wrapper function for caching the output.
+        '''
+        redis_store.incr(f'count:{url}')
+        result = redis_store.get(f'result:{url}')
+        if result:
+            return result.decode('utf-8')
+        result = method(url)
+        redis_store.set(f'count:{url}', 0)
+        redis_store.setex(f'result:{url}', 10, result)
+        return result
+    return invoker
 
 
-@count_url_access
+@data_cacher
 def get_page(url: str) -> str:
-    """
-    Fetch the HTML content of a given URL.
-    For testing, return just the status code to pass the test.
-    """
-    resp = requests.get(url)
-    return str(resp.status_code)
-
-
-if __name__ == "__main__":
-    url = "http://google.com"
-    print(get_page(url))
+    '''Returns the content of a URL after caching the request's response,
+    and tracking the request.
+    '''
+    return requests.get(url).text
