@@ -32,7 +32,7 @@ def count_url_access(method):
         html = method(url)
 
         # Cache the result and set expiration to 10 seconds
-        store.setex(result_cache_key, 10, html)  # Use setex to combine set and expire
+        store.setex(result_cache_key, 10, html)
 
         return html
 
