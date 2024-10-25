@@ -2,7 +2,6 @@
 """
 Implementing an expiring web cache and tracker.
 """
-
 import redis
 import requests
 from functools import wraps
@@ -15,7 +14,6 @@ def count_url_access(method):
     Track how many times a particular URL was accessed
     and cache the result for 10 seconds.
     """
-
     @wraps(method)
     def wrapper(url: str) -> str:  # Added space after the colon
         result_cache_key = "cached:" + url
@@ -34,7 +32,7 @@ def count_url_access(method):
         store.set(result_cache_key, html)
         store.expire(result_cache_key, 10)
 
-        return html
+        return html if resp.status_code == 200 else "0"
 
     return wrapper
 
@@ -48,7 +46,7 @@ def get_page(url: str) -> str:  # Added space after the colon
     try:
         resp = requests.get(url)
         # Return "OK" if the request is successful (status code 200)
-        return "OK" if resp.status_code == 200 else "0"
+        return "OK" if resp.text == 200 else "0"
     except requests.RequestException:
         return "0"  # Return "0" in case of any request error
 
@@ -58,5 +56,5 @@ if __name__ == "__main__":
         "http://slowwly.robertomurray.co.uk/delay/3000/"
         "url/https://google.com"
     )
-    print(get_page(test_url))
+    print(get_page(test_url))  # This should print "OK" if accessible
     print("Access count:", store.get(f"count:{test_url}").decode("utf-8"))
