@@ -49,6 +49,7 @@ def get_page(url: str) -> str:
 
 
 if __name__ == "__main__":
-    url = "http://google.com"
-    print(get_page(url))
-    print("URL accessed:", store.get(f"count:{url}").decode("utf-8"))
+    test_url = "http://slowwly.robertomurray.co.uk/delay/
+    3000/url/https://google.com"
+    print(get_page(test_url))
+    print("Access count:", store.get(f"count:{test_url}").decode("utf-8"))
